@@ -1,10 +1,16 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
 import { path } from 'src/constants/path'
 import RatingStars from '../RatingStars/RatingStars'
 import * as S from './filterpanel.style'
+import PropTypes from 'prop-types'
+import qs from 'query-string'
+import useQuery from 'src/hooks/useQuery'
 
-export default function FilterPanel() {
+export default function FilterPanel({ categories, filters }) {
+  const history = useHistory()
+  const query = useQuery()
+
   return (
     <div>
       <S.CategoryTitleLink to={path.home}>
@@ -24,15 +30,23 @@ export default function FilterPanel() {
         Tất cả danh mục
       </S.CategoryTitleLink>
       <S.CategoryList>
-        <S.CategoryItem>
-          <NavLink to="">Quần áo</NavLink>
-        </S.CategoryItem>
-        <S.CategoryItem>
-          <NavLink to="">Quần áo</NavLink>
-        </S.CategoryItem>
-        <S.CategoryItem>
-          <NavLink to="">Quần áo</NavLink>
-        </S.CategoryItem>
+        {categories.map(category => (
+          <S.CategoryItem key={category._id}>
+            <NavLink
+              to={path.home + `?category=${category._id}`}
+              isActive={(match, location) => {
+                if (!match) {
+                  return false
+                }
+
+                const query = qs.parse(location.search)
+                return query.category === category._id
+              }}
+            >
+              {category.name}
+            </NavLink>
+          </S.CategoryItem>
+        ))}
       </S.CategoryList>
       <S.CategoryTitle>
         <svg enableBackground="new 0 0 15 15" viewBox="0 0 15 15" x={0} y={0} className="shopee-svg-icon ">
@@ -67,4 +81,9 @@ export default function FilterPanel() {
       <S.RemoveFilterButton>Xóa tất cả</S.RemoveFilterButton>
     </div>
   )
+}
+
+FilterPanel.propTypes = {
+  categories: PropTypes.array.isRequired,
+  filters: PropTypes.object.isRequired
 }
