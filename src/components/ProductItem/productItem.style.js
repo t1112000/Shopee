@@ -39,12 +39,12 @@ export const ProductItemInfo = styled.div`
 `
 export const ProductItemTitle = styled.div`
   display: inline-block;
-  display: --webkit-box;
-  work-wrap: break-word;
+  display: -webkit-box;
+  word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
-  --webkit-box-orient: vertical;
-  --webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-size: 1.2rem;
   line-height: 1.4rem;
   margin-bottom: 0.5rem;

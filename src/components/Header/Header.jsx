@@ -1,11 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { path } from 'src/constants/path'
 import usePopover from 'src/hooks/usePopover'
+import useQuery from 'src/hooks/useQuery'
+import { formatMoney } from 'src/utils/helper'
 import Navbar from '../Navbar/Navbar'
 import Popover from '../Popover/Popover'
 import * as S from './header.style'
 
 export default function Header() {
   const { activePopover, hidePopover, showPopover } = usePopover()
+  const [searchValue, setSearchValue] = useState('')
+  const history = useHistory()
+  const query = useQuery()
+  const purchases = useSelector(state => state.cart.purchases)
+
+  useEffect(() => {
+    const { name = '' } = query
+    setSearchValue(name)
+  }, [query])
+
+  const onChangeSearch = event => {
+    setSearchValue(event.target.value)
+  }
+
+  const search = event => {
+    event.preventDefault()
+    history.push(path.home + `?name=${searchValue}`)
+  }
 
   return (
     <S.StyledHeader>
@@ -19,8 +42,8 @@ export default function Header() {
               </g>
             </svg>
           </S.Logo>
-          <S.StyledForm>
-            <S.StyledInput placeholder="Tìm kiếm sản phẩm" />
+          <S.StyledForm onSubmit={search}>
+            <S.StyledInput placeholder="Tìm kiếm sản phẩm" value={searchValue} onChange={onChangeSearch} />
             <S.StyledButton type="submit">
               <svg height={19} viewBox="0 0 19 19" width={19} className="shopee-svg-icon ">
                 <g fillRule="evenodd" stroke="none" strokeWidth={1}>
@@ -53,21 +76,23 @@ export default function Header() {
                   <circle cx="10.7" cy={23} r="2.2" stroke="none" />
                   <circle cx="19.7" cy={23} r="2.2" stroke="none" />
                 </svg>
-                <S.CartNumberBage>5</S.CartNumberBage>
+                {purchases.length > 0 && <S.CartNumberBage>{purchases.length}</S.CartNumberBage>}
               </S.CartIcon>
               <Popover active={activePopover}>
                 <S.PopoverContent>
                   <S.PopoverTitle>Sản phẩm mới thêm</S.PopoverTitle>
-                  <S.MiniProductCart>
-                    <S.MiniProductCartImg src="https://cf.shopee.vn/file/9bdafdfebfcd4412dbb043ffcdec8cbc_tn" />
-                    <S.MiniProductCartTitle>Sữa Tắm Hương Nước Hoa JOEEYLOVES 500ML</S.MiniProductCartTitle>
-                    <S.MiniProductCartPrice>d970.000</S.MiniProductCartPrice>
-                  </S.MiniProductCart>
+                  {purchases.slice(0, 5).map(purchase => (
+                    <S.MiniProductCart key={purchase._id}>
+                      <S.MiniProductCartImg src={purchase.product.image} />
+                      <S.MiniProductCartTitle>{purchase.product.name}</S.MiniProductCartTitle>
+                      <S.MiniProductCartPrice>đ{formatMoney(purchase.product.price)}</S.MiniProductCartPrice>
+                    </S.MiniProductCart>
+                  ))}
                   <S.PopoverFooter>
                     <S.MoreProduct>
-                      <span>1 sản phẩm vào giỏ</span>
+                      {purchases.length > 5 && <span>{purchases.length - 5} sản phẩm vào giỏ</span>}
                     </S.MoreProduct>
-                    <S.ButtonShowCart to="">Xem giỏ hàng</S.ButtonShowCart>
+                    <S.ButtonShowCart to={path.cart}>Xem giỏ hàng</S.ButtonShowCart>
                   </S.PopoverFooter>
                 </S.PopoverContent>
               </Popover>

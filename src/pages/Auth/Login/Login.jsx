@@ -11,6 +11,7 @@ import { Link, useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { login } from '../auth.slice'
 import { unwrapResult } from '@reduxjs/toolkit'
+import { Helmet } from 'react-helmet-async'
 
 export default function Login() {
   const {
@@ -52,6 +53,9 @@ export default function Login() {
   }
   return (
     <S.StyledRegister>
+      <Helmet>
+        <title>Đăng nhập</title>
+      </Helmet>
       <S.Container className="container">
         <S.Banner />
         <S.FormWrapper>

@@ -6,10 +6,14 @@ import { useDispatch } from 'react-redux'
 import { getCategories, getProducts } from './home.slice'
 import { unwrapResult } from '@reduxjs/toolkit'
 import useQuery from 'src/hooks/useQuery'
+import { Helmet } from 'react-helmet-async'
 
 export default function Home() {
   const [categories, setCategories] = useState([])
-  const [products, setProducts] = useState({})
+  const [products, setProducts] = useState({
+    products: [],
+    pagination: {}
+  })
   const [filters, setFilters] = useState({})
   const dispatch = useDispatch()
   const query = useQuery()
@@ -26,7 +30,8 @@ export default function Home() {
     const _filters = {
       ...query,
       page: query.page || 1,
-      limit: query.limit || 30
+      limit: query.limit || 30,
+      sortBy: query.sortBy || 'view'
     }
     setFilters(_filters)
 
@@ -37,7 +42,10 @@ export default function Home() {
       exclude: _filters.exclude,
       rating_filter: _filters.rating,
       price_max: _filters.maxPrice,
-      price_min: _filters.minPrice
+      price_min: _filters.minPrice,
+      sort_by: _filters.sortBy,
+      order: _filters.order,
+      name: _filters.name
     }
     const _getProducts = async () => {
       const data = await dispatch(getProducts({ params }))
@@ -49,12 +57,15 @@ export default function Home() {
 
   return (
     <div>
+      <Helmet>
+        <title>Shopee Việt Nam | Mua và Bán trên ứng dụng di động hoặc website</title>
+      </Helmet>
       <S.Container className="container">
         <S.Side>
           <FilterPanel categories={categories} filters={filters} />
         </S.Side>
         <S.Main>
-          <SearchItemResult products={products} />
+          <SearchItemResult products={products} filters={filters} />
         </S.Main>
       </S.Container>
     </div>
